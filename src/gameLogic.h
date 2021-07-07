@@ -3,6 +3,7 @@
 #include "unit.h"
 Unit unitArray[3][3];
 char symbol = 'X';
+int count = 0;
 
 int tryPlace(std::string cord, char symbol) {
     int xCord, yCord;
@@ -75,9 +76,12 @@ bool checkWin() {
     // Checks for a win diagonally.
     if ((unitArray[0][0].getState() == unitArray[1][1].getState()) &&
         (unitArray[1][1].getState() == unitArray[2][2].getState()) &&
-        (unitArray[0][0].getState() != ' ')) {
+        (unitArray[0][0].getState() != ' ') || // This part checks for 1st diagonal
+        (unitArray[0][2].getState() == unitArray[1][1].getState()) &&
+        (unitArray[1][1].getState() == unitArray[2][0].getState()) &&
+        (unitArray[2][0].getState() != ' ')) { // This part checks for 2nd diagonal
         render();
-        std::cout << unitArray[0][0].getState() << " won!";
+        std::cout << unitArray[1][1].getState() << " won!";
         return true;
     }
     // If there is no win, then every check will
@@ -92,8 +96,10 @@ void logic() {
         std::cin >> position;
         std::cout << std::endl;
         int result = tryPlace(position, symbol);
-        if (result == 0)
+        if (result == 0){
             symbol = 'O';
+            count++;
+        }
         else if (result == 1)
             std::cout << "Place already taken, please choose another one. \n";
         else if (result == 2)
@@ -111,9 +117,22 @@ void logic() {
             std::cout << "Invalid coordinates.\n";
     }
     if (checkWin()) {
+        count = 0;
         bool playAgain = false;
         std::string input;
         std::cout << std::endl << "Would you like to play again? y/n: ";
+        std::cin >> input;
+        if (input == "y" || input == "Y")
+            playAgain = true;
+        if (playAgain)
+            resetGame();
+        else
+            exit(0);
+    }
+    if (count == 9) {
+        bool playAgain = false;
+        std::string input;
+        std::cout << std::endl << "It's a tie! Would you like to play again? y/n: ";
         std::cin >> input;
         if (input == "y" || input == "Y")
             playAgain = true;
